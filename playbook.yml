@@ -1,0 +1,8 @@
+---
+
+- name: Mon premier playbook
+  hosts: all
+  tasks:
+  - name: Configuration du hostname
+    hostname:
+      name: "{{ hostname }}"
