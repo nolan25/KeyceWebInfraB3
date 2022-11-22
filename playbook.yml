@@ -3,6 +3,35 @@
 - name: Mon premier playbook
   hosts: all
   tasks:
+  - name: Configurer dhclient
+    lineinfile:
+      regexp: ^#?prepend domain\-name\-servers .*$
+      line: "prepend domain-name-servers 8.8.8.8;"
+      path: /etc/dhcp/dhclient.conf
+    register: dhclient_conf
+
+  - name: Redémarrer les serveurs
+    reboot:
+    when: dhclient_conf.changed
   - name: Configuration du hostname
     hostname:
       name: "{{ hostname }}"
+
+  - name: Resolution du hostname
+    lineinfile:
+      regexp: ^127\.0\.1\.1\s.*$
+      line: "127.0.1.1 {{ hostname }}"
+      path: /etc/hosts
+
+  - name: Mise à jour du système (apt)
+    apt:
+      update_cache: yes
+      upgrade: yes
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    
+  - name: Mise à jour du système (dnf)
+    dnf:
+      update_cache: yes
+      name: "*"
+      state: latest
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat' or ansible_distribution == 'Fedora'
