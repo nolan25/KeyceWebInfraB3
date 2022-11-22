@@ -42,3 +42,14 @@
   tasks:
   - name: Inclusion des taches web
     include_tasks: tasks/web-tasks.yml
+
+- name: Déploiement des interpreteurs php
+  hosts: php
+  tasks:
+  - name: Inclusion des taches php
+    include_tasks: tasks/php-tasks.yml
+  handlers:
+  - name: Redémarrer php-fpm
+    service:
+      name: php{{ php_version }}-fpm
+      state: restarted

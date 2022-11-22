@@ -1,0 +1,15 @@
+---
+
+- name: Installer php-fpm
+  package:
+    name: php-fpm
+    state: latest
+
+- name: COnfigurer php-fpm
+  lineinfile:
+    regexp: ^listen = .*$
+    path: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
+    line: "listen = 81"
+  notify: Redémarrer php-fpm
+
+

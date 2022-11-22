@@ -10,3 +10,8 @@
   package:
     name: "{{ http_server }}"
     state: latest
+
+- name: Démarrer Apache
+  service:
+    name: "{{ http_server }}"
+    state: started
