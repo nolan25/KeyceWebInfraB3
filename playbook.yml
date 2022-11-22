@@ -13,6 +13,7 @@
   - name: Redémarrer les serveurs
     reboot:
     when: dhclient_conf.changed
+
   - name: Configuration du hostname
     hostname:
       name: "{{ hostname }}"
@@ -28,10 +29,16 @@
       update_cache: yes
       upgrade: yes
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    
+
   - name: Mise à jour du système (dnf)
     dnf:
       update_cache: yes
       name: "*"
       state: latest
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat' or ansible_distribution == 'Fedora'
+
+- name: Déploiement des serveurs web
+  hosts: web
+  tasks:
+  - name: Inclusion des taches web
+    include_tasks: tasks/web-tasks.yml

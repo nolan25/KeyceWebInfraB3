@@ -1,0 +1,12 @@
+---
+
+- name: Suppression de nginx
+  package:
+    name: nginx*
+    state: absent
+  when: http_server != 'nginx'
+    
+- name: Installation du serveur web
+  package:
+    name: "{{ http_server }}"
+    state: latest
