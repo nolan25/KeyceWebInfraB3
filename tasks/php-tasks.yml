@@ -1,15 +1,31 @@
 ---
 
-- name: Installer php-fpm
+- name: Installer PHP et NFS client
   package:
-    name: php-fpm
+    name: "{{ paquets }}"
     state: latest
+  vars:
+    paquets:
+    - php-fpm
+    - php-mysql
+    - nfs-common
 
-- name: COnfigurer php-fpm
+- name: Configurer php-fpm
   lineinfile:
     regexp: ^listen = .*$
     path: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
-    line: "listen = 81"
+    line: "listen = {{ php_fpm_port }}"
   notify: Redémarrer php-fpm
 
+- name: Créer le repertoire wordpress
+  file:
+    path: /var/www/wordpress
+    state: directory
 
+- name: Monter le partage NFS
+  mount:
+    src: "{{ hostvars[groups['web'][0]]['ansible_all_ipv4_addresses'] | ansible.utils.ipaddr('10.42.42.0/24') | first }}:/var/www/wordpress"
+    path: /var/www/wordpress
+    opts: rw,sync
+    state: mounted
+    fstype: nfs

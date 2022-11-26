@@ -1,3 +1,5 @@
 node_role: db
 db_server: mariadb
-
+db_name: wp_bdd
+db_user: wordpress
+db_password: ThisPasswordShouldBeProtectedWithAnsibleVault!!!

@@ -1,0 +1,4 @@
+---
+
+- name: Actualiser NFS
+  command: exportfs -a

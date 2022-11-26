@@ -1,0 +1,30 @@
+---
+
+- name: Installer MariaDB
+  package:
+    name: "{{ paquets }}"
+    state: latest
+  vars:
+    paquets:
+    - mariadb-server
+    - python3-pymysql
+
+- name: Configurer MariaDB
+  template:
+    src: files/mariadb.cnf
+    dest: /etc/mysql/mariadb.conf.d/90-network.cnf
+  notify: Redémarrer mariadb
+
+- name: Créer la base de données Wordpress
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: Créer l'utilisateur pour wordpress
+  mysql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    host: "%"
+    priv: "{{ db_name }}.*:ALL"
+    login_unix_socket: /run/mysqld/mysqld.sock

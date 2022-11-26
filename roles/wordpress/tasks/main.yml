@@ -1,0 +1,27 @@
+---
+
+- name: Installation de Git
+  package:
+    name: git
+    state: latest
+
+- name: Créer le repertoire wordpress
+  file:
+    path: /var/www/wordpress
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: Télécharger wordpress
+  git:
+    repo: https://github.com/WordPress/WordPress.git
+    dest: /var/www/wordpress
+    version: 6.1-branch
+    force: yes
+
+- name: Régler les permissions
+  file:
+    path: /var/www/wordpress
+    owner: www-data
+    group: www-data
+    recurse: yes

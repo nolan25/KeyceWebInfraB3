@@ -1,0 +1,13 @@
+---
+
+- name: Installation de nfs-kernel-server
+  package:
+    name: nfs-kernel-server
+    state: latest
+
+- name: Partager /var/www/wordpress
+  lineinfile:
+    regexp: ^/var/www/wordpress .*$
+    line: "/var/www/wordpress {{ hostvars['php.keyce-infra.com']['ansible_all_ipv4_addresses'] | ansible.utils.ipaddr('10.42.42.0/24') | first }}(rw,sync,fsid=0,no_subtree_check)"
+    path: /etc/exports
+  notify: Actualiser NFS

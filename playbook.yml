@@ -1,6 +1,23 @@
 ---
 
-- name: Mon premier playbook
+- name: Configuration de l'hôte de Déploiement
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  - name: Mettre à jour les paquets PIP
+    pip:
+      name: "{{ paquets }}"
+      state: latest
+      executable: ~/.local/bin/pip
+    become: false
+    vars:
+      paquets:
+      - pip
+      - ansible
+      - netaddr # pour pouvoir utiliser le filtre "ipaddr"
+      - PyMySQL # pour pouvoir utiliser les modules mysql_*
+
+- name: Configurations de base
   hosts: all
   tasks:
   - name: Configurer dhclient
@@ -39,9 +56,10 @@
 
 - name: Déploiement des serveurs web
   hosts: web
-  tasks:
-  - name: Inclusion des taches web
-    include_tasks: tasks/web-tasks.yml
+  roles:
+  - wordpress
+  - apache2
+  - nfs-server
 
 - name: Déploiement des interpreteurs php
   hosts: php
@@ -52,4 +70,15 @@
   - name: Redémarrer php-fpm
     service:
       name: php{{ php_version }}-fpm
+      state: restarted
+
+- name: Déploiement du serveur de bdd
+  hosts: db
+  tasks:
+  - name: Inclusion des taches db
+    include_tasks: tasks/db-tasks.yml
+  handlers:
+  - name: Redémarrer mariadb
+    service:
+      name: mariadb
       state: restarted

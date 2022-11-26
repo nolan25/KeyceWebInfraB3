@@ -1,0 +1,37 @@
+---
+
+- name: Suppression de nginx
+  package:
+    name: nginx*
+    state: absent
+    
+- name: Installation de Apache
+  package:
+    name: "{{ paquets }}"
+    state: latest
+  vars:
+    paquets:
+    - apache2
+
+- name: Démarrer Apache
+  service:
+    name: apache2
+    state: started
+
+- name: Activer le module fastcgi
+  command: a2enmod proxy_fcgi
+  changed_when: "'Module proxy_fcgi already enabled' not in fcgi_enable.stdout"
+  register: fcgi_enable
+  notify: Redémarrer apache2
+
+- name: Désactiver le Virtualhost par défaut
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+  notify:  Redémarrer apache2
+
+- name: Configurer le virtualhost wordpress
+  template:
+    src: files/apache2_wp.conf
+    dest: /etc/apache2/sites-enabled/wp.conf
+  notify:  Redémarrer apache2
