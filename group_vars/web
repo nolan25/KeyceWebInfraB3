@@ -1,2 +1,3 @@
 node_role: web
 http_server: apache2
+node_role: noteweb
